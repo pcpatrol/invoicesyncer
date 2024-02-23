@@ -1,5 +1,9 @@
 FROM php:8.2-apache
 
+# Install Node.js and npm
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs
+
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
@@ -27,3 +31,33 @@ RUN a2enmod rewrite
 COPY ./apache2.conf /etc/apache2/sites-available/000-default.conf
 
 # Your remaining Dockerfile instructions...
+
+
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Install MySQL client
+RUN apt-get update && apt-get install -y default-mysql-client
+
+# Install PHP zip extension
+RUN apt-get install -y libzip-dev zip && \
+    docker-php-ext-install zip
+
+# Enable PHP zip extension
+RUN docker-php-ext-enable zip
+
+# Set up environment variables for MariaDB connection
+ENV DB_HOST=mariadb
+ENV DB_PORT=3306
+ENV DB_DATABASE=mydatabase
+ENV DB_USERNAME=myuser
+ENV DB_PASSWORD=mypassword
+
+# Enable Apache rewrite module
+RUN a2enmod rewrite
+
+# Set up Apache virtual host
+COPY ./apache2.conf /etc/apache2/sites-available/000-default.conf
+
+# Your remaining Dockerfile instructions...
+
